@@ -1,5 +1,6 @@
 <template>
   <div class="min-h-screen bg-white dark:bg-dark-900">
+    <SpeedInsights />
     <!-- Navigation -->
     <nav class="fixed top-0 w-full z-50 glass-effect border-b border-gray-200 dark:border-dark-700/50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -88,5 +89,7 @@
 </template>
 
 <script setup lang="ts">
+import { SpeedInsights } from '@vercel/speed-insights/vue'
+
 const mobileMenuOpen = ref(false)
 </script>
