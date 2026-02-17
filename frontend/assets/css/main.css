@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  html:not(.dark) {
+    color-scheme: light;
+  }
+
+  body {
+    @apply bg-white text-gray-900 transition-colors duration-300;
+  }
+
+  html.dark body {
+    @apply bg-dark-900 text-dark-100;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-primary-500 text-white rounded-lg font-semibold transition-all duration-300 hover:bg-primary-600 hover:shadow-lg hover:shadow-primary-500/50 active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-gray-200 text-gray-900 rounded-lg font-semibold transition-all duration-300 hover:bg-gray-300 border border-gray-300 active:scale-95;
+  }
+
+  html.dark .btn-secondary {
+    @apply bg-dark-700 text-dark-100 border-dark-600 hover:bg-dark-600;
+  }
+
+  .card {
+    @apply bg-gray-50 rounded-xl border border-gray-200 p-6 transition-all duration-300 hover:border-primary-500/50 hover:shadow-md hover:shadow-primary-500/20;
+  }
+
+  html.dark .card {
+    @apply bg-dark-800 border-dark-700 hover:shadow-lg hover:shadow-primary-500/10;
+  }
+
+  .section-title {
+    @apply text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-400 via-primary-500 to-primary-600 bg-clip-text text-transparent;
+  }
+
+  .glass-effect {
+    @apply bg-white/40 backdrop-blur-xl border border-gray-200;
+  }
+
+  html.dark .glass-effect {
+    @apply bg-dark-800/40 border-dark-700/50;
+  }
+}

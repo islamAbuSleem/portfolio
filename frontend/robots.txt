@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /.nuxt/
+Disallow: /node_modules/
+Disallow: /.git/
+
+Sitemap: https://yourportfolio.com/sitemap.xml

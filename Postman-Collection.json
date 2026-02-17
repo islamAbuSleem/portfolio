@@ -1,0 +1,2064 @@
+{
+  "info": {
+    "_postman_id": "portfolio-api-v1",
+    "name": "Portfolio API - v1.0.0",
+    "description": "Complete API collection for Portfolio CMS. Backend: Express.js + Drizzle ORM + PostgreSQL. Includes authentication, CRUD operations for projects/skills/experiences, contact messages, profile management, and image uploads via Cloudinary.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "portfolio-backend"
+  },
+  "item": [
+    {
+      "name": "📚 Documentation",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            },
+            "description": "Check if API is running"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/",
+                  "host": ["{{baseUrl}}"],
+                  "path": [""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "html",
+              "header": [],
+              "cookie": [],
+              "body": "Portfolio API is running..."
+            }
+          ]
+        },
+        {
+          "name": "Full API Flow",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profile"]
+            },
+            "description": "Example workflow: 1) Login → 2) Get Profile → 3) Create Project → 4) Upload Images → 5) Update Profile"
+          },
+          "response": []
+        }
+      ],
+      "description": "API documentation and health checks"
+    },
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "POST /api/auth/login - Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"your-secure-password\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Authenticate admin user and receive JWT token. Token expires in 90 days."
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"securePass123\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"email\": \"admin@example.com\",\n      \"name\": \"Admin User\",\n      \"role\": \"admin\",\n      \"createdAt\": \"2024-01-15T10:00:00Z\"\n    }\n  }\n}"
+            },
+            {
+              "name": "Error - 401 Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"wrong@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "login"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"fail\",\n  \"message\": \"Incorrect email or password\"\n}"
+            },
+            {
+              "name": "Error - 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@example.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "login"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"fail\",\n  \"message\": \"Please provide email and password\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test status code",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Test response structure",
+                  "pm.test('Response has correct structure', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('success');",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.expect(jsonData.data).to.have.property('user');",
+                  "    pm.expect(jsonData.data.user).to.have.property('id');",
+                  "    pm.expect(jsonData.data.user).to.have.property('email');",
+                  "    pm.expect(jsonData.data.user).to.have.property('role');",
+                  "});",
+                  "",
+                  "// Save token to environment",
+                  "pm.test('Save token to environment', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('accessToken', jsonData.token);",
+                  "    pm.environment.set('userId', jsonData.data.user.id);",
+                  "    console.log('Token saved successfully');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Authentication endpoints for admin access"
+    },
+    {
+      "name": "👤 Profile",
+      "item": [
+        {
+          "name": "GET /api/profile - Get Profile (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profile"]
+            },
+            "description": "Get public profile information. Creates default profile if none exists."
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/profile",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "profile"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"profile\": {\n      \"id\": 1,\n      \"fullName\": \"John Doe\",\n      \"title\": \"Senior Software Engineer\",\n      \"tagline\": \"Building scalable solutions\",\n      \"bio\": \"Passionate developer with 10+ years of experience...\",\n      \"location\": \"San Francisco, CA\",\n      \"email\": \"john@example.com\",\n      \"phone\": \"+1 (555) 123-4567\",\n      \"avatarUrl\": \"https://res.cloudinary.com/demo/image/upload/avatar.jpg\",\n      \"resumeUrl\": \"https://res.cloudinary.com/demo/raw/upload/resume.pdf\",\n      \"website\": \"https://johndoe.com\",\n      \"socialLinks\": {\n        \"github\": \"https://github.com/johndoe\",\n        \"linkedin\": \"https://linkedin.com/in/johndoe\",\n        \"twitter\": \"https://twitter.com/johndoe\",\n        \"instagram\": null,\n        \"youtube\": null,\n        \"dev\": \"https://dev.to/johndoe\"\n      },\n      \"seoTitle\": \"John Doe - Senior Software Engineer\",\n      \"seoDescription\": \"Portfolio of John Doe, a senior software engineer...\",\n      \"seoImage\": \"https://example.com/og-image.jpg\",\n      \"metaKeywords\": \"software engineer, full-stack, javascript\",\n      \"themeColor\": \"#3b82f6\",\n      \"showResume\": true,\n      \"showContact\": true,\n      \"updatedAt\": \"2024-01-20T15:30:00Z\"\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has profile data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('success');",
+                  "    pm.expect(jsonData.data).to.have.property('profile');",
+                  "    pm.expect(jsonData.data.profile).to.have.property('fullName');",
+                  "    pm.expect(jsonData.data.profile).to.have.property('title');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /api/profile - Update Profile (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"John Doe\",\n  \"title\": \"Senior Software Engineer\",\n  \"tagline\": \"Building scalable solutions\",\n  \"bio\": \"Passionate developer with 10+ years of experience in full-stack development...\",\n  \"location\": \"San Francisco, CA\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"+1 (555) 123-4567\",\n  \"avatarUrl\": \"https://example.com/avatar.jpg\",\n  \"website\": \"https://johndoe.com\",\n  \"socialLinks\": {\n    \"github\": \"https://github.com/johndoe\",\n    \"linkedin\": \"https://linkedin.com/in/johndoe\",\n    \"twitter\": \"https://twitter.com/johndoe\",\n    \"dev\": \"https://dev.to/johndoe\"\n  },\n  \"seoTitle\": \"John Doe - Senior Software Engineer\",\n  \"seoDescription\": \"Portfolio showcasing full-stack development expertise\",\n  \"metaKeywords\": \"software engineer, full-stack, react, node.js\",\n  \"themeColor\": \"#3b82f6\",\n  \"showResume\": true,\n  \"showContact\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profile"]
+            },
+            "description": "Update profile information. Requires admin authentication."
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"fullName\": \"John Doe Updated\",\n  \"title\": \"Lead Software Engineer\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/profile",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "profile"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"profile\": {\n      \"id\": 1,\n      \"fullName\": \"John Doe Updated\",\n      \"title\": \"Lead Software Engineer\",\n      \"updatedAt\": \"2024-01-20T16:00:00Z\"\n    }\n  }\n}"
+            },
+            {
+              "name": "Error - 401 Unauthorized",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/profile",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "profile"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"fail\",\n  \"message\": \"You are not logged in! Please log in to get access.\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Profile updated successfully', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('success');",
+                  "    pm.expect(jsonData.data.profile).to.have.property('updatedAt');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /api/profile/resume - Upload Resume (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "resume",
+                  "type": "file",
+                  "src": "/path/to/resume.pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profile/resume",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profile", "resume"]
+            },
+            "description": "Upload PDF resume. Max file size: 5MB."
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "resume",
+                      "type": "file",
+                      "src": "/path/to/resume.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/profile/resume",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "profile", "resume"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"resumeUrl\": \"/uploads/resume-1234567890.pdf\"\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Resume URL returned', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('resumeUrl');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Profile management endpoints"
+    },
+    {
+      "name": "📁 Projects",
+      "item": [
+        {
+          "name": "GET /api/projects - Get All Projects (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page (default: 10, max: 100)"
+                }
+              ]
+            },
+            "description": "Get paginated list of all projects. Sorted by year descending."
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/projects",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "projects"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"projects\": [\n      {\n        \"id\": 1,\n        \"title\": \"E-Commerce Platform\",\n        \"description\": \"A full-stack e-commerce solution with real-time inventory...\",\n        \"techStack\": [\"Vue.js\", \"Node.js\", \"PostgreSQL\", \"Redis\"],\n        \"repoUrl\": \"https://github.com/johndoe/ecommerce\",\n        \"liveUrl\": \"https://ecommerce-demo.com\",\n        \"imageUrls\": [\"https://cloudinary.com/image1.jpg\"],\n        \"year\": 2024,\n        \"category\": \"Web App\",\n        \"createdAt\": \"2024-01-15T10:00:00Z\",\n        \"updatedAt\": \"2024-01-15T10:00:00Z\"\n      }\n    ],\n    \"pagination\": {\n      \"currentPage\": 1,\n      \"totalPages\": 5,\n      \"totalItems\": 42,\n      \"itemsPerPage\": 10,\n      \"hasNextPage\": true,\n      \"hasPrevPage\": false\n    },\n    \"links\": {\n      \"self\": \"http://localhost:3001/api/projects?page=1&limit=10\",\n      \"first\": \"http://localhost:3001/api/projects?page=1&limit=10\",\n      \"last\": \"http://localhost:3001/api/projects?page=5&limit=10\",\n      \"next\": \"http://localhost:3001/api/projects?page=2&limit=10\"\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has projects array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('success');",
+                  "    pm.expect(jsonData.data).to.have.property('projects');",
+                  "    pm.expect(jsonData.data).to.have.property('pagination');",
+                  "    pm.expect(jsonData.data.projects).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/projects/:id - Get Single Project (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects", "{{projectId}}"]
+            },
+            "description": "Get a single project by ID"
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/projects/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "projects", "1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"project\": {\n      \"id\": 1,\n      \"title\": \"E-Commerce Platform\",\n      \"description\": \"A full-stack e-commerce solution...\",\n      \"techStack\": [\"Vue.js\", \"Node.js\", \"PostgreSQL\"],\n      \"repoUrl\": \"https://github.com/johndoe/ecommerce\",\n      \"liveUrl\": \"https://ecommerce-demo.com\",\n      \"imageUrls\": [\"https://cloudinary.com/image1.jpg\"],\n      \"year\": 2024,\n      \"category\": \"Web App\",\n      \"createdAt\": \"2024-01-15T10:00:00Z\",\n      \"updatedAt\": \"2024-01-15T10:00:00Z\"\n    }\n  }\n}"
+            },
+            {
+              "name": "Error - 404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/projects/999",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "projects", "999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"fail\",\n  \"message\": \"No project found with that ID\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has project data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('project');",
+                  "    pm.expect(jsonData.data.project).to.have.property('id');",
+                  "    pm.expect(jsonData.data.project).to.have.property('title');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /api/projects - Create Project (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"New Project\",\n  \"description\": \"Description of the project...\",\n  \"techStack\": [\"React\", \"TypeScript\", \"Node.js\"],\n  \"repoUrl\": \"https://github.com/johndoe/new-project\",\n  \"liveUrl\": \"https://new-project-demo.com\",\n  \"imageUrls\": [\"https://cloudinary.com/image1.jpg\"],\n  \"year\": 2024,\n  \"category\": \"Web App\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/projects",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects"]
+            },
+            "description": "Create a new project. Required fields: title, description, techStack."
+          },
+          "response": [
+            {
+              "name": "Success - 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Analytics Dashboard\",\n  \"description\": \"Real-time analytics platform...\",\n  \"techStack\": [\"React\", \"D3.js\", \"AWS\"],\n  \"category\": \"Web App\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/projects",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "projects"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"project\": {\n      \"id\": 2,\n      \"title\": \"Analytics Dashboard\",\n      \"description\": \"Real-time analytics platform...\",\n      \"techStack\": [\"React\", \"D3.js\", \"AWS\"],\n      \"repoUrl\": null,\n      \"liveUrl\": null,\n      \"imageUrls\": null,\n      \"year\": null,\n      \"category\": \"Web App\",\n      \"createdAt\": \"2024-01-20T10:00:00Z\",\n      \"updatedAt\": \"2024-01-20T10:00:00Z\"\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Project created successfully', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('success');",
+                  "    pm.expect(jsonData.data.project).to.have.property('id');",
+                  "    pm.environment.set('projectId', jsonData.data.project.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /api/projects/:id - Update Project (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Project Title\",\n  \"description\": \"Updated description...\",\n  \"techStack\": [\"Vue.js\", \"Nuxt\", \"TypeScript\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects", "{{projectId}}"]
+            },
+            "description": "Update an existing project. All fields are optional."
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Updated Title\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/projects/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "projects", "1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"project\": {\n      \"id\": 1,\n      \"title\": \"Updated Title\",\n      \"updatedAt\": \"2024-01-20T12:00:00Z\"\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Project updated successfully', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('success');",
+                  "    pm.expect(jsonData.data.project).to.have.property('updatedAt');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /api/projects/:id - Delete Project (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects", "{{projectId}}"]
+            },
+            "description": "Delete a project by ID"
+          },
+          "response": [
+            {
+              "name": "Success - 204 No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/projects/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "projects", "1"]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": null\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Project CRUD operations"
+    },
+    {
+      "name": "🎯 Skills",
+      "item": [
+        {
+          "name": "GET /api/skills - Get All Skills (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/skills?page=1&limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "skills"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Get paginated list of all skills"
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/skills",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "skills"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"skills\": [\n      {\n        \"id\": 1,\n        \"name\": \"Vue.js\",\n        \"category\": \"Frontend\",\n        \"level\": \"Expert\",\n        \"icon\": \"vue\",\n        \"color\": \"#3b82f6\",\n        \"createdAt\": \"2024-01-15T10:00:00Z\"\n      },\n      {\n        \"id\": 2,\n        \"name\": \"Node.js\",\n        \"category\": \"Backend\",\n        \"level\": \"Expert\",\n        \"icon\": \"nodejs\",\n        \"color\": \"#10b981\",\n        \"createdAt\": \"2024-01-15T10:00:00Z\"\n      }\n    ],\n    \"pagination\": {\n      \"currentPage\": 1,\n      \"totalPages\": 1,\n      \"totalItems\": 2,\n      \"itemsPerPage\": 50,\n      \"hasNextPage\": false,\n      \"hasPrevPage\": false\n    },\n    \"links\": {\n      \"self\": \"http://localhost:3001/api/skills?page=1&limit=50\",\n      \"first\": \"http://localhost:3001/api/skills?page=1&limit=50\",\n      \"last\": \"http://localhost:3001/api/skills?page=1&limit=50\"\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has skills array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('skills');",
+                  "    pm.expect(jsonData.data.skills).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /api/skills - Create Skill (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"TypeScript\",\n  \"category\": \"Frontend\",\n  \"level\": \"Expert\",\n  \"icon\": \"typescript\",\n  \"color\": \"#3178c6\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/skills",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "skills"]
+            },
+            "description": "Create a new skill. Required: name, category."
+          },
+          "response": [
+            {
+              "name": "Success - 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Docker\",\n  \"category\": \"DevOps\",\n  \"level\": \"Intermediate\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/skills",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "skills"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"skill\": {\n      \"id\": 3,\n      \"name\": \"Docker\",\n      \"category\": \"DevOps\",\n      \"level\": \"Intermediate\",\n      \"icon\": null,\n      \"color\": null,\n      \"createdAt\": \"2024-01-20T10:00:00Z\"\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Skill created successfully', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.skill).to.have.property('id');",
+                  "    pm.environment.set('skillId', jsonData.data.skill.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /api/skills/:id - Update Skill (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": \"Expert\",\n  \"color\": \"#2496ed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/skills/{{skillId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "skills", "{{skillId}}"]
+            },
+            "description": "Update an existing skill"
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"level\": \"Expert\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/skills/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "skills", "1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"skill\": {\n      \"id\": 1,\n      \"level\": \"Expert\"\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /api/skills/:id - Delete Skill (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/skills/{{skillId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "skills", "{{skillId}}"]
+            },
+            "description": "Delete a skill by ID"
+          },
+          "response": [
+            {
+              "name": "Success - 204 No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/skills/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "skills", "1"]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": null\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Skills management endpoints"
+    },
+    {
+      "name": "💼 Experience",
+      "item": [
+        {
+          "name": "GET /api/experiences - Get All Experiences (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/experiences?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "experiences"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Get paginated list of all experiences. Sorted by order field ascending."
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/experiences",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "experiences"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"experiences\": [\n      {\n        \"id\": 1,\n        \"company\": \"Tech Corp\",\n        \"role\": \"Senior Software Engineer\",\n        \"period\": \"2022 - Present\",\n        \"description\": \"Led development of microservices architecture...\",\n        \"technologies\": [\"TypeScript\", \"Node.js\", \"Kubernetes\", \"AWS\"],\n        \"order\": 0,\n        \"createdAt\": \"2024-01-15T10:00:00Z\"\n      },\n      {\n        \"id\": 2,\n        \"company\": \"StartupXYZ\",\n        \"role\": \"Full Stack Engineer\",\n        \"period\": \"2019 - 2022\",\n        \"description\": \"Built scalable web applications from scratch...\",\n        \"technologies\": [\"Vue.js\", \"React\", \"PostgreSQL\", \"Redis\"],\n        \"order\": 1,\n        \"createdAt\": \"2024-01-15T10:00:00Z\"\n      }\n    ],\n    \"pagination\": {\n      \"currentPage\": 1,\n      \"totalPages\": 1,\n      \"totalItems\": 2,\n      \"itemsPerPage\": 20,\n      \"hasNextPage\": false,\n      \"hasPrevPage\": false\n    },\n    \"links\": {\n      \"self\": \"http://localhost:3001/api/experiences?page=1&limit=20\",\n      \"first\": \"http://localhost:3001/api/experiences?page=1&limit=20\",\n      \"last\": \"http://localhost:3001/api/experiences?page=1&limit=20\"\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has experiences array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('experiences');",
+                  "    pm.expect(jsonData.data.experiences).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /api/experiences - Create Experience (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company\": \"New Company\",\n  \"role\": \"Software Engineer\",\n  \"period\": \"2023 - Present\",\n  \"description\": \"Description of responsibilities and achievements...\",\n  \"technologies\": [\"React\", \"Node.js\", \"PostgreSQL\"],\n  \"order\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/experiences",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "experiences"]
+            },
+            "description": "Create a new experience entry. Required: company, role, period, description, technologies."
+          },
+          "response": [
+            {
+              "name": "Success - 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"company\": \"Tech Giant\",\n  \"role\": \"Principal Engineer\",\n  \"period\": \"2024 - Present\",\n  \"description\": \"Leading architecture decisions...\",\n  \"technologies\": [\"Go\", \"Kubernetes\", \"AWS\"]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/experiences",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "experiences"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"experience\": {\n      \"id\": 3,\n      \"company\": \"Tech Giant\",\n      \"role\": \"Principal Engineer\",\n      \"period\": \"2024 - Present\",\n      \"description\": \"Leading architecture decisions...\",\n      \"technologies\": [\"Go\", \"Kubernetes\", \"AWS\"],\n      \"order\": 0,\n      \"createdAt\": \"2024-01-20T10:00:00Z\"\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Experience created successfully', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.experience).to.have.property('id');",
+                  "    pm.environment.set('experienceId', jsonData.data.experience.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /api/experiences/:id - Update Experience (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"Senior Software Engineer II\",\n  \"description\": \"Updated description...\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/experiences/{{experienceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "experiences", "{{experienceId}}"]
+            },
+            "description": "Update an existing experience entry"
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"period\": \"2022 - 2024\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/experiences/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "experiences", "1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"experience\": {\n      \"id\": 1,\n      \"period\": \"2022 - 2024\"\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /api/experiences/:id - Delete Experience (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/experiences/{{experienceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "experiences", "{{experienceId}}"]
+            },
+            "description": "Delete an experience entry by ID"
+          },
+          "response": [
+            {
+              "name": "Success - 204 No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/experiences/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "experiences", "1"]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": null\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Experience/work history management"
+    },
+    {
+      "name": "💬 Messages",
+      "item": [
+        {
+          "name": "POST /api/messages - Send Message (Public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Visitor\",\n  \"email\": \"visitor@example.com\",\n  \"subject\": \"Project Inquiry\",\n  \"message\": \"Hello, I'm interested in discussing a potential project...\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages"]
+            },
+            "description": "Send a contact message. Rate limited: 5 requests per hour per IP. Required: name, email, message."
+          },
+          "response": [
+            {
+              "name": "Success - 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane@company.com\",\n  \"subject\": \"Collaboration Opportunity\",\n  \"message\": \"I'd love to discuss a potential collaboration on a new project.\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/messages",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "messages"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"message\": {\n      \"id\": 1,\n      \"name\": \"Jane Doe\",\n      \"email\": \"jane@company.com\",\n      \"subject\": \"Collaboration Opportunity\",\n      \"message\": \"I'd love to discuss a potential collaboration...\",\n      \"isRead\": false,\n      \"createdAt\": \"2024-01-20T10:00:00Z\"\n    }\n  }\n}"
+            },
+            {
+              "name": "Error - 429 Too Many Requests",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/messages",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "messages"]
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Too many messages sent from this IP, please try again after an hour\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Message sent successfully', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('success');",
+                  "    pm.expect(jsonData.data.message).to.have.property('id');",
+                  "    pm.expect(jsonData.data.message.isRead).to.eql(false);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/messages - Get All Messages (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/messages?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Get all contact messages. Requires admin authentication. Sorted by createdAt descending."
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/messages",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "messages"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"messages\": [\n      {\n        \"id\": 1,\n        \"name\": \"Jane Doe\",\n        \"email\": \"jane@company.com\",\n        \"subject\": \"Collaboration Opportunity\",\n        \"message\": \"I'd love to discuss a potential collaboration...\",\n        \"isRead\": false,\n        \"createdAt\": \"2024-01-20T10:00:00Z\"\n      }\n    ],\n    \"pagination\": {\n      \"currentPage\": 1,\n      \"totalPages\": 1,\n      \"totalItems\": 1,\n      \"itemsPerPage\": 20,\n      \"hasNextPage\": false,\n      \"hasPrevPage\": false\n    },\n    \"links\": {\n      \"self\": \"http://localhost:3001/api/messages?page=1&limit=20\",\n      \"first\": \"http://localhost:3001/api/messages?page=1&limit=20\",\n      \"last\": \"http://localhost:3001/api/messages?page=1&limit=20\"\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has messages array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('messages');",
+                  "    pm.expect(jsonData.data.messages).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /api/messages/:id/read - Mark as Read (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/messages/{{messageId}}/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages", "{{messageId}}", "read"]
+            },
+            "description": "Mark a message as read. Requires admin authentication."
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/messages/1/read",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "messages", "1", "read"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"message\": {\n      \"id\": 1,\n      \"isRead\": true\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Message marked as read', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.message.isRead).to.eql(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Contact message management"
+    },
+    {
+      "name": "📤 Uploads",
+      "item": [
+        {
+          "name": "POST /api/upload/image - Upload Single Image (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "/path/to/image.jpg"
+                },
+                {
+                  "key": "folder",
+                  "value": "projects",
+                  "type": "text",
+                  "description": "Optional: projects, avatars, general"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/image",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "image"]
+            },
+            "description": "Upload a single image to Cloudinary. Max file size: 5MB. Allowed types: JPEG, PNG, WebP, GIF."
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "src": "/path/to/project-screenshot.jpg"
+                    },
+                    {
+                      "key": "folder",
+                      "value": "projects",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/upload/image",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "upload", "image"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"url\": \"https://res.cloudinary.com/demo/image/upload/v123/projects/image.jpg\",\n    \"publicId\": \"projects/image\"\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Image uploaded successfully', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('url');",
+                  "    pm.expect(jsonData.data).to.have.property('publicId');",
+                  "    pm.environment.set('imageUrl', jsonData.data.url);",
+                  "    pm.environment.set('imagePublicId', jsonData.data.publicId);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /api/upload/images - Upload Multiple Images (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": "/path/to/image1.jpg"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": "/path/to/image2.jpg"
+                },
+                {
+                  "key": "folder",
+                  "value": "projects",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/images",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "images"]
+            },
+            "description": "Upload up to 5 images at once. Max total size: 25MB (5MB per file)."
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "images",
+                      "type": "file",
+                      "src": "/path/to/image1.jpg"
+                    },
+                    {
+                      "key": "images",
+                      "type": "file",
+                      "src": "/path/to/image2.jpg"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/upload/images",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "upload", "images"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"results\": 2,\n  \"data\": {\n    \"images\": [\n      {\n        \"url\": \"https://res.cloudinary.com/demo/image/upload/v123/projects/image1.jpg\",\n        \"publicId\": \"projects/image1\"\n      },\n      {\n        \"url\": \"https://res.cloudinary.com/demo/image/upload/v123/projects/image2.jpg\",\n        \"publicId\": \"projects/image2\"\n      }\n    ]\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Images uploaded successfully', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.results).to.be.a('number');",
+                  "    pm.expect(jsonData.data.images).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /api/upload/image/:publicId - Delete Image (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/image/{{imagePublicId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "image", "{{imagePublicId}}"]
+            },
+            "description": "Delete an image from Cloudinary by public ID."
+          },
+          "response": [
+            {
+              "name": "Success - 204 No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/upload/image/projects%2Fimage1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "upload", "image", "projects%2Fimage1"]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": null\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Image upload management via Cloudinary"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set default timeout for all requests",
+          "pm.request.timeout = {",
+          "    ","request: 30000",
+          "};"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test: Check if response is JSON",
+          "pm.test('Response is valid JSON (if applicable)', function () {",
+          "    const contentType = pm.response.headers.get('Content-Type');",
+          "    if (contentType && contentType.includes('application/json')) {",
+          "        pm.response.to.be.json;",
+          "    }",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001",
+      "type": "string",
+      "description": "API base URL - change for production"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT token - automatically set after login"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string",
+      "description": "Current user ID - automatically set after login"
+    },
+    {
+      "key": "projectId",
+      "value": "1",
+      "type": "string",
+      "description": "Project ID for testing"
+    },
+    {
+      "key": "skillId",
+      "value": "1",
+      "type": "string",
+      "description": "Skill ID for testing"
+    },
+    {
+      "key": "experienceId",
+      "value": "1",
+      "type": "string",
+      "description": "Experience ID for testing"
+    },
+    {
+      "key": "messageId",
+      "value": "1",
+      "type": "string",
+      "description": "Message ID for testing"
+    },
+    {
+      "key": "imagePublicId",
+      "value": "",
+      "type": "string",
+      "description": "Cloudinary image public ID - set after upload"
+    },
+    {
+      "key": "imageUrl",
+      "value": "",
+      "type": "string",
+      "description": "Uploaded image URL - set after upload"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  }
+}
