@@ -19,7 +19,7 @@ export default defineNuxtConfig({
     adminApiSecret: process.env.ADMIN_API_SECRET || '',
     // Public keys (client-side accessible)
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:3001'
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://portfolio-usca.onrender.com'
     }
   },
 
